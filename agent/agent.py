@@ -60,10 +60,16 @@ async def create_user(page, email: str):
     status = page.locator("[data-testid='create-status']")
     try:
         await status.wait_for(state="visible", timeout=5000)
+        status_text = await status.text_content()
+        
+        if status_text and "already exists" in status_text.lower():
+            print(f"[Agent] Done: User {email} already exists (not created)")
+        elif status_text and "error" in status_text.lower():
+            print(f"[Agent] Error: {status_text}")
+        else:
+            print(f"[Agent] Done: Successfully created user {email}")
     except Exception:
         print("[Agent] Warning: Could not find explicit success status, but form was submitted.")
-
-    print(f"[Agent] Done: Successfully created user {email}")
 
 
 # ---------------------------------------------------------------------------
